@@ -1,0 +1,55 @@
+I",%<p>Before taking a break from the enterprise big data world to build own projects I looked for tech stacks to optimize productivity for indie makers (and most other non-infrastructure businesses) and wrote <a href="/dev/2019/05/03/is-typescript-the-only-language-your-company-needs.html">Is TypeScript the only language your company needs?</a> back in May. This is an end-of-year review of technical 
+learnings from shipping 3 products and 2 open-source libraries with TypeScript since that article.</p>
+
+<p><strong>Web SaaS (React frontend + NestJS backend + flushout data model)</strong> <br />
+PlotDash - plotdash.com <br />
+ImpactMiner - impactminer.com</p>
+
+<p><strong>iOS and Android apps (React Native, no backend)</strong> <br />
+ThinkCool - thinkcool.app</p>
+
+<p><strong>Open-source libraries (available on NPM/Github)</strong> <br />
+flushout - Event sourcing-based distributed data model for interactive collaboration <br />
+async-sequential-runner - Utility to run pausing asynchronous tasks in sequence</p>
+
+<h2 id="backends-with-nestjs-and-postgres">Backends with NestJS and Postgres</h2>
+<p>NestJS is a web framework that provides dependency injection along with integrations and abstractions for existing web middleware, such as Express, Fastify and TypeORM. The framework makes it easy to modularize the application for easy testing with mock-databases or separation into microservices. The programming model is familiar to users of enterprise dependency frameworks such as Java’s Guice or Spring.</p>
+
+<p>NestJS itself has full TypeScript support and working with the framework was mostly hassle-free with great documentation, including the types. Things get trickier when configuring the libraries Nest use to provide functionality, especially when libraries are not natively built with strict TypeScript such as the Express web framework and the CSURF CSRF-library. You are likely to spend some time looking at the repos of subsystem libraries for documentation and configuration.</p>
+
+<h3 id="database-access-with-typeorm">Database access with TypeORM</h3>
+<p>NestJS provides rich integration with Object-Relational-Model library TypeORM for abstracting data base access. Experience makes me stick to using only simple functionality in ORMs that translate to easily-debuggable SQL queries, but it’s nice to have a layer that abstracts the query from the exact SQL to allow swapping out or mocking database constructs for tests. TypeORM also has great management for migrations, to allow operations such as adding or modifying database columns in a controlled manner.</p>
+
+<p>TypeORM comes with support for many different databases, but I did run into some issues with missing support for surprisingly common functionality, such as getting the number of updated rows from Postgres (necessary for optimistic updates). Fortunately, TypeORM is written in TypeScript so it was fairly easy to create a fork with a workaround until the issue finally got fixed and merged.</p>
+
+<h4 id="defensive-techniques-against-javascript-pitfalls">Defensive techniques against JavaScript pitfalls</h4>
+<p>JavaScript libraries, or even some undisciplined TypeScript libraries, are not always careful about JavaScript falsy-value handling so avoid passing numbers or strings to such libraries as they may interpret zeroes or empty strings as missing values. For instance, the JWT authentication token integration in Nest expects you to return a user identifier or undefined/null to tell whether authentication was successful, but returning user ID zero as a number causes the authentication library to assume authentication failed.</p>
+
+<p>You will likely save yourself debugging time by ensuring that whenever you pass something through an unknown library that accepts different types, defensively wrap numbers and strings in objects to ensure existence (i.e. { userId: 0 }).</p>
+
+<p>JavaScript’s standard number type’s incompatibility with 64-bit integer types can also cause issues when integrating with systems like databases. It was easy to create a TypeORM entity field with a number type that mapped to a Postgres ‘bigint’ column, but negative numbers in the column would be interpreted incorrectly when translated to JavaScript. Be extra careful when working with 64-bit integers from other systems and check library documentation about whether to use BigInt or strings instead of normal number types.</p>
+
+<h2 id="web-frontends-and-iosandroid-apps-with-react-native">Web frontends and iOS/Android apps with React (Native)</h2>
+<p>React is great for single-page applications and comes with support for TypeScript so I used it for both web frontends for ImpactMiner and PlotDash, and also the mobile app ThinkCool using React Native. TypeScript support for React Native requires starting from a separate starter template, but web and native applications render different components so the application code is not directly translatable between web and native anyway (more on this below).</p>
+
+<p>Component library Bootstrap made styling the web front-ends easy with freely available themes and responsive layout constructs to work on different screens sizes. The components rendered by React Native lack support for CSS classes and certain forms of style inheritance so the styling and component ecosystem is more fragmented with different component libraries offering their own theming systems. Due to the greater fragmentation in React Native, it makes sense to spend extra time before starting the project to evaluate libraries for the components your application needs and don’t expect to find as many ready-made themes.</p>
+
+<h3 id="hybrid-web-and-mobile-applications">Hybrid web and mobile applications</h3>
+<p>For hybrid applications that run both on the web and mobile there are compatibility libraries let you write a web application using components and styling from React Native, but not the other way around. So if you want to start a hybrid application you should start with a React Native application, but the translation libraries also rely on configuring JavaScript packagers like Babel so getting TypeScript to work may require more manual steps than starting a pure web or native project.</p>
+
+<h3 id="ecosystem-stability">Ecosystem stability</h3>
+<p>The libraries in the React Native ecosystem were generally less mature and more fragile than for React web. I had to chase down Github issues to manually update the iOS project’s Info.plist and Android project’s build.gradle files to get the common icon library react-native-vector-icons to work on the platforms and abandoned the effort to add an Android splash screen due to instabilities in the splash screen libraries (it was easy enough to add a splash screen for iOS with XCode).</p>
+<h2 id="flushout-instead-of-redux-and-graphql">Flushout instead of Redux and GraphQL</h2>
+<p>Both PlotDash and ImpactMiner require responsive interaction, users should not have to wait for server-side updates when they drag and drop items or otherwise operate the UI. The two apps were also built for remote collaboration, to support multiple users and devices updating the same PlotDash script or ImpactMiner case.</p>
+
+<p>Distributed data model flushout lets the client update a local state model for immediate resposiveness and the updates get flushed to a remote master model in the background for persistence and merging with updates from other clients. Using flushout for client state in the web apps meant I did not use popular state library Redux, but React’s addition of hooks and context has many developers skipping Redux in new applications and I also stuck to simple state hooks and property hierarchies in mobile app ThinkCool.</p>
+
+<p>GraphQL lets the client perform detailed queries for the exact information it needs to reduce transfer sizes and times, but as each PlotDash script and ImpactMiner case is small enough to fit in the client memory and load quickly on initial page load there was little need for that kind of flexibility. The web apps just download the whole Flushout model snapshot on initial page load and let flushout’s proxy-master communication incrementally keep the client and backend models synchronized over simple REST calls.</p>
+
+<h3 id="sequential-asynchronous-execution">Sequential asynchronous execution</h3>
+<p>Flushout is based on event sourcing so updates from clients need to be applied to the master model sequentially. This proved tricky in Node’s highly asynchronous environment as pausing one client update to retrieve the master from the database may result in an update from another client starting to update the same master. It was possible to sequentialize such asynchronous tasks by digging into TypeScript’s asynchronous generator functions but the code gets quite tricky, so library async-sequential-runner helps encapsulate this use in a simpler API.</p>
+
+<h2 id="final-thoughts">Final Thoughts</h2>
+<p>Most of the learnings and problems around building the products were non-technical, things like launching on Product Hunt and doing marketing, billing, EU VAT bureacracy etc. TypeScript worked great as a full-stack language and its future is looking bright as it has wide adoption in the JavaScript ecosystem, most JavaScript libraries I used that were not already written in TypeScript at least had type definitions, and TypeScript-native runtime <a href="https://deno.land">Deno</a> that may address some of the issues with NodeJS is nearing release 1.0.</p>
+
+:ET
