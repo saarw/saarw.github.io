@@ -17,37 +17,29 @@ Flushout was created to support state synchronization between multiple devices a
 ## The example app
 Clients that use Flushout for collaborative state typically retrieve a snapshot of the latest state from the backend and uses it to initialize a local Flushout proxy. The user’s input are applied as create, update, and delete commands on the proxy, which immediately updates the local state to drive the user interface while also storing the commands for later replication to the backend. 
 
-{% highlight ts %}
-{% github_sample saarw/flushout-example/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx 75 83 %}
-{% endhighlight %}
+<script charset="UTF-8" src="https://gist-it.appspot.com/github.com/saarw/flushout-example/commit/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx?slice=75:84&footer=minimal"></script>
 <small>Our example initializes the state of each client with a run-once React effect hook. The example only tracks command counts to demonstrate Flushout's inner workings in the UI, omitted in a real application.</small>
 
-{% highlight ts %}
-{% github_sample saarw/flushout-example/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx 69 71 %}
+<script charset="UTF-8" src="https://gist-it.appspot.com/github.com/saarw/flushout-example/commit/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx?slice=69:72&footer=no"></script>
 ...
-{% github_sample saarw/flushout-example/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx 117 124 %}
-{% endhighlight %}
+<script charset="UTF-8" src="https://gist-it.appspot.com/github.com/saarw/flushout-example/commit/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx?slice=117:125&footer=minimal"></script>
 <small>When the user clicks to add a new todo, we apply a Create command to the local proxy.</small>
 
 ### Synchronizing with the master model
 To demonstrate Flushout's operations, our application requires the user to manually trigger synchronization with the master model by pressing the Flush button. This would normally happen automatically in the background when the user interacts with the client or when the client gets notified of server updates.
 
 A flush is a list of commands that have been applied to the local proxy but have not been transmitted to the master. The master's response to a flush updates the local state of the proxy to that of the master, including any changes performed on the master by other clients.
-{% highlight ts %}
-{% github_sample saarw/flushout-example/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx 132 134 %}
-{% endhighlight %}
+<script charset="UTF-8" src="https://gist-it.appspot.com/github.com/saarw/flushout-example/commit/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Client.tsx?slice=132:135&footer=minimal"></script>
 
 ## The backend
 Our application runs completely in the browser so the client works against a simple backend API that is implemented locally but uses asynchronous operations that could easily be implemented with a remote backend over a REST or RPC API.
-{% highlight ts %}
-{% github_sample saarw/flushout-example/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/types.ts 11 14 %}
-{% endhighlight %}
+<script charset="UTF-8" src="https://gist-it.appspot.com/github.com/saarw/flushout-example/commit/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/types.ts?slice=11:15&footer=minimal"></script>
+
 
 Our backend implementation demonstrates applying flushes from clients to a master model and also includes an interceptor to demonstrate setting values that are computed when commands are applied to the master model. 
 
-{% highlight ts %}
-{% github_sample saarw/flushout-example/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Backend.ts 14 24 %}
-{% endhighlight %}
+<script charset="UTF-8" src="https://gist-it.appspot.com/github.com/saarw/flushout-example/commit/2ebceec6a6ee78b34405f3890857bef8f1850eed/src/Backend.ts?slice=14:25&footer=minimal"></script>
+
 
 <small>Interceptors can also be used to check model-dependent validation, such as whether a user has reached the maximum number of todos they are allowed to create.</small>
 
