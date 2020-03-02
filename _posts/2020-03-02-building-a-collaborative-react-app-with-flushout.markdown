@@ -4,7 +4,7 @@ title:  "Building a collaborative React app with Flushout"
 date:   2020-03-02 18:42:49 +0700
 categories: dev
 ---
-This posts demonstrates using the [Flushout](https://github.com/saarw/flushout) distributed data model to synchronize React states in different clients with a backend to build a simple collaborative todo-list app. You can run the example [in your browser](https://eager-almeida-2b573e.netlify.com/) or view the [source](https://github.com/saarw/flushout-example) of the example on Github.
+This posts demonstrates using the [Flushout](https://github.com/saarw/flushout) distributed data model to synchronize React states in different clients through a backend to build a simple collaborative todo-list app. You can run the example [in your browser](https://eager-almeida-2b573e.netlify.com/) or view the [source](https://github.com/saarw/flushout-example) of the example on Github.
 
 ## Flushout and event sourcing
 Flushout is a distributed data model with a local client state model that gets updated without any network delays for fast UI updates while also synchronizing with a remote master model in the background to support collaboration. 
