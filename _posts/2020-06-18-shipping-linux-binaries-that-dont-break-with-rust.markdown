@@ -28,7 +28,7 @@ This tactic allows broad Linux compatibility and lets you use allocators such as
 Incompatible Transport Layers Security library dependencies can also break your binary.
 
 ### Use Rustls
-[Rustls](https://crates.io/crates/rustls) replaces the operating system TLS implementation, such as OpenSSL, for your binary with a memory-safe implementation in Rust. By compiling your program with Rustls your program no-longer depends on OpenSSL or other libraries being installed on the target system.
+[Rustls](https://crates.io/crates/rustls) replaces dependencies on specific operating system TLS implementations (such as OpenSSL, LibreSSL or BoringSSL) for your binary with a memory-safe implementation in Rust. By compiling your program with Rustls your program no-longer depends on OpenSSL or other libraries being installed on the target system.
 
 Popular communication libraries in Rust often allow you to specify Rustls using feature flags or by dependending on specific crates. For instance the reqwest http client uses Rustls by specifying the flag rustls-tls in the dependency
 
