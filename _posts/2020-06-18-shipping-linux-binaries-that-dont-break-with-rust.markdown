@@ -10,9 +10,7 @@ Operating systems differences can cause your Rust binaries to break when run in 
 Your binary will fail to run if it depends on Glibc and was compiled with a newer Glibc version than your target system (or if your target system does not use Glibc at all). Tactics to avoid Glibc incompatibilities include compiling with MUSL or a really old Glibc version.
 
 ### Statically compile MUSL into your binaries
-This tactic works when you are building an executable binary, but not when you are building a [dynamic library](https://github.com/rust-lang/rust/issues/34987). 
-
-MUSL is a light-weight replacement for Glibc used in Alpine Linux. MUSL can be statically compiled into your Rust program to create a self-contained executable that will run without dependencies on Glibc.
+MUSL is a lightweight replacement for Glibc used in Alpine Linux. MUSL can be statically compiled into your Rust program to create a self-contained executable that will run without dependencies on Glibc.
 
 Compiling your program with MUSL may impact your program’s performance, binary size, and limit your use of certain libraries, such as the jemalloc memory allocator. 
 
