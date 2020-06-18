@@ -4,7 +4,7 @@ title:  "Shipping Linux binaries that don't break with Rust"
 date:   2020-06-18 17:11:00 +0700
 categories: dev
 ---
-Operating systems differences can cause your Rust binaries to break when run in a different environment than they were compiled in. Here are the most common things to watch out for.
+Operating system differences can cause your Rust binaries to break when run in a different environment than they were compiled in. Here are the most common things to watch out for.
 
 ## Avoid Glibc incompatibilities
 Your binary will fail to run if it depends on Glibc and was compiled with a newer Glibc version than your target system (or if your target system does not use Glibc at all). Tactics to avoid Glibc incompatibilities include compiling with MUSL or a really old Glibc version.
