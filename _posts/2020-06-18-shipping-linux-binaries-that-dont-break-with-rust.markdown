@@ -14,10 +14,10 @@ MUSL is a lightweight replacement for Glibc used in Alpine Linux. MUSL can be st
 
 Compiling your program with MUSL may impact your program’s performance, binary size, and limit your use of certain libraries, such as the jemalloc memory allocator. 
 
-Simple programs can be [cross-compiled with MUSL](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) by adding the MUSL target in Rustup and specifying the target for cargo build. However, popular libraries, like crypto crate [ring](https://crates.io/crates/ring), still do some C compilation and require more MUSL development libraries to be available in your environment. 
+Simple programs can be [cross-compiled with MUSL](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) by adding the MUSL target in Rustup and specifying the target for cargo build. However, popular libraries, like crypto crate [ring](https://crates.io/crates/ring), still do some C compilation and require more MUSL development libraries to be available in your environment at build time. 
 
-A more robust solution to compile your Rust for MUSL is to use a builder that runs in a Docker container with MUSL support, such as:
-[https://github.com/emk/rust-musl-builder](https://github.com/emk/rust-musl-builder)
+A more robust solution to compile your Rust for MUSL is to use a builder that runs in a Docker container with MUSL support, such as
+[rust-musl-builder](https://github.com/emk/rust-musl-builder)
 
 ### Compile with a really old version of Glibc
 Glibc is backwards compatible so your program will run if it is compiled with an older version of Glibc than installed on your target system. To use this tactic, just run your production builds in a Docker image with the oldest version of Linux you can find. 
