@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Shipping Linux binaries that don't break with Rust"
-date:   2020-03-02 18:42:49 +0700
+date:   2020-06-18 17:11:00 +0700
 categories: dev
 ---
 Operating systems differences can cause your Rust binaries to break when run in a different environment than they were compiled in. Here are the most common things to watch out for.
