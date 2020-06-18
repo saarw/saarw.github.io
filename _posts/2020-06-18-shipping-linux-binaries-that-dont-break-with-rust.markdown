@@ -24,7 +24,7 @@ Glibc is backwards compatible so your program will run if it is compiled with an
 
 This tactic allows broad Linux compatibility and lets you use allocators such as jemalloc, but makes your binary depend on Glibc and prevents running on Alpine Linux (at least without special compatibility layers).
 
-## Avoid SSL-library incompatibilities
+## Avoid incompatible SSL-library dependencies
 Incompatible Transport Layers Security library dependencies can also break your binary.
 
 ### Use Rustls
